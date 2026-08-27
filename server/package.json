@@ -7,7 +7,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "graphiql": "echo \"Opening GraphiQL interface\" && npx ruru -SP -p 3001 -e http://localhost:3000/graphql"
   },
   "dependencies": {
     "express": "^5.2.1",

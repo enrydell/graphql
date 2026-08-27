@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
-const { graphqlHTTP } = require('graphql-http');
+const { createHandler } = require('graphql-http/lib/use/express');
+const schema = require('./schema/schema');
 
-app.use('/graphql', graphqlHTTP({
-  schema: require('./schema/schema'), // Replace with your GraphQL schema
-  rootValue: {}, // Replace with your root value
-  graphiql: true, // Enable GraphiQL interface
+app.use('/graphql', createHandler({
+  schema,
+  rootValue: {},
 }));
 
 app.get('/', (req, res) => {
