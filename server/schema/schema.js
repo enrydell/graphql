@@ -35,6 +35,12 @@ const RootQuery = new GraphQLObjectType({
         return 'Hello, World!';
       }
     },
+    books: {
+      type: new graphql.GraphQLList(BookType),
+      resolve() {
+        return dummyBooks;
+      }
+    },
     book: {
       args: {
         id: { type: GraphQLString }
