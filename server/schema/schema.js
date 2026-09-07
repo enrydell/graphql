@@ -7,22 +7,8 @@ const {
   GraphQLInt,
   GraphQLList
 } = graphql;
-
-const dummyBooks = [
-  { id: '1', name: 'The Great Gatsby', genre: 'Classic', authorId: '3' },
-  { id: '2', name: '1984', genre: 'Dystopian', authorId: '1' },
-  { id: '3', name: 'To Kill a Mockingbird', genre: 'Fiction', authorId: '2' },
-  { id: '4', name: 'Brave New World', genre: 'Dystopian', authorId: '1' },
-  { id: '5', name: 'The Catcher in the Rye', genre: 'Fiction', authorId: '2' },
-  { id: '6', name: 'The Hobbit', genre: 'Fantasy', authorId: '3' },
-  { id: '7', name: 'The Lord of the Rings', genre: 'Fantasy', authorId: '3' },
-];
-
-const dummyAuthors = [
-  { id: '1', name: 'George Orwell', age: 46 },
-  { id: '2', name: 'Harper Lee', age: 28 },
-  { id: '3', name: 'J.R.R. Tolkien', age: 56 }
-];
+const Author = require('../models/author');
+const Book = require('../models/book');
 
 const BookType = new GraphQLObjectType({
   name: 'Book',
@@ -40,7 +26,7 @@ const BookType = new GraphQLObjectType({
       type: AuthorType,
       resolve(book) {
         const authorId = book.authorId;
-        return dummyAuthors.find(author => author.id === authorId) || null;
+        return Author.findById(authorId);
       }
     }
   })
@@ -61,7 +47,7 @@ const AuthorType = new GraphQLObjectType({
     books: {
       type: new GraphQLList(BookType),
       resolve(author) {
-        return dummyBooks.filter(book => book.authorId === author.id);
+        return Book.find({ authorId: author.id });
       }
     }
   })
@@ -79,7 +65,7 @@ const RootQuery = new GraphQLObjectType({
     books: {
       type: new GraphQLList(BookType),
       resolve() {
-        return dummyBooks;
+        return Book.find();
       }
     },
     book: {
@@ -88,13 +74,13 @@ const RootQuery = new GraphQLObjectType({
       },
       type: BookType,
       resolve(_, args) {
-        return dummyBooks.find(book => book.id === args.id) || null;
+        return Book.findById(args.id);
       }
     },
     authors: {
       type: new GraphQLList(AuthorType),
       resolve() {
-        return dummyAuthors;
+        return Author.find();
       }
     },
     author: {
@@ -103,12 +89,93 @@ const RootQuery = new GraphQLObjectType({
       },
       type: AuthorType,
       resolve(_, args) {
-        return dummyAuthors.find(author => author.id === args.id) || null;
+        return Author.findById(args.id);
+      }
+    }
+  }
+});
+
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addAuthor: {
+      type: AuthorType,
+      args: {
+        name: { type: GraphQLString },
+        age: { type: GraphQLInt }
+      },
+      resolve(_, args) {
+        const author = new Author({
+          name: args.name,
+          age: args.age
+        });
+
+        return author.save();
+      }
+    },
+    addBook: {
+      type: BookType,
+      args: {
+        name: { type: GraphQLString },
+        genre: { type: GraphQLString },
+        author: { type: GraphQLString }
+      },
+      async resolve(_, args) {
+        const author = await Author.findOne({ name: args.author });
+
+        if (!author) {
+          throw new Error(`Author with name "${args.author}" not found.`);
+        }
+
+        const book = new Book({
+          name: args.name,
+          genre: args.genre,
+          authorId: author.id
+        });
+
+        return await book.save();
       }
     }
   }
 });
 
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation
 });
+
+// mutation {
+//   addAuthor(name: "C.S. Lewis", age: 55) {
+//     id
+//   }
+//   addAuthor(name: "J.K. Rowling", age: 55) {
+//     id
+//     name
+//     age
+//   }
+//   addBook(name: "Harry Potter and the Sorcerer's Stone", genre: "Fantasy", author: "J.K. Rowling") {
+//     id
+//     name
+//     genre
+//     author {
+//       id
+//       name
+//       age
+//     }
+//   }
+//   addAuthor(name: "George R.R. Martin", age: 72) {
+//     id
+//     name
+//     age
+//   }
+//   addBook(name: "A Game of Thrones", genre: "Fantasy", author: "George R.R. Martin") {
+//     id
+//     name
+//     genre
+//     author {
+//       id
+//       name
+//       age
+//     }
+//   }
+// }

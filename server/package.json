@@ -7,12 +7,16 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "start": "node app",
     "test": "echo \"Error: no test specified\" && exit 1",
     "graphiql": "echo \"Opening GraphiQL interface\" && npx ruru -SP -p 3001 -e http://localhost:3000/graphql"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "graphql": "^15.10.2",
-    "graphql-http": "^1.23.0"
+    "graphql-http": "^1.23.0",
+    "mongodb": "^7.6.0",
+    "mongoose": "^9.9.5"
   }
 }
