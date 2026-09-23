@@ -12,6 +12,7 @@
     "graphiql": "echo \"Opening GraphiQL interface\" && npx ruru -SP -p 4001 -e http://localhost:4000/graphql"
   },
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "graphql": "^15.10.2",
