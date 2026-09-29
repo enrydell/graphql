@@ -1,8 +1,17 @@
 import { useQuery } from "@apollo/client/react";
 import { GET_AUTHORS } from "../queries/Queries";
 
+interface Author {
+  id: string;
+  name: string;
+}
+
+interface AuthorsData {
+  authors: Author[];
+}
+
 function AddBook() {
-  const { loading, error, data } = useQuery(GET_AUTHORS);
+  const { loading, error, data } = useQuery<AuthorsData>(GET_AUTHORS);
 
   if (error) return <p>Error: {error.message}</p>;
 
@@ -25,7 +34,7 @@ function AddBook() {
             {loading ? (
               <option>Loading authors...</option>
             ) : (
-              data.authors.map((author: any) => (
+              data?.authors.map((author: Author) => (
                 <option key={author.id} value={author.id}>
                   {author.name}
                 </option>
