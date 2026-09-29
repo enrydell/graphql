@@ -1,23 +1,8 @@
 import { useQuery } from "@apollo/client/react";
-import { GET_BOOKS } from "../queries/Queries";
-
-interface Book {
-  id: string;
-  name: string;
-  genre: string;
-  author: Author;
-}
-
-interface Author {
-  name: string;
-}
-
-interface BooksData {
-  books: Book[];
-}
+import { GET_BOOKS, type Book } from "../queries/Queries";
 
 function BookList() {
-  const { loading, error, data } = useQuery<BooksData>(GET_BOOKS);
+  const { loading, error, data } = useQuery(GET_BOOKS);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
